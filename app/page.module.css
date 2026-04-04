@@ -77,7 +77,7 @@
 .hero {
   position: relative;
   padding: 152px 28px 96px;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .heroGlow {
