@@ -38,6 +38,9 @@ const FEATURES = [
 
 export default async function HomePage() {
   const result = await fetchLatestRelease();
+  if (!result.ok) {
+    console.error("[homepage] failed to fetch latest release:", result.status, result.message);
+  }
   const latestRelease = result.ok && result.data.length > 0 ? result.data[0] : null;
   const version = latestRelease?.tag_name ?? null;
 
