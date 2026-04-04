@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS } from "@/lib/github";
+import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS, GITHUB_API_CACHE_TTL } from "@/lib/github";
 
 export async function GET(): Promise<NextResponse> {
   let ghRes: Response;
   try {
     ghRes = await fetch(GITHUB_RELEASES_API, {
       headers: GITHUB_FETCH_HEADERS,
-      next: { revalidate: 60 },
+      next: { revalidate: GITHUB_API_CACHE_TTL },
     });
   } catch {
     return NextResponse.json(
@@ -50,7 +50,7 @@ export async function GET(): Promise<NextResponse> {
   let fileRes: Response;
   try {
     fileRes = await fetch(downloadUrl, {
-      headers: { "User-Agent": "163MusicProServer" },
+      headers: { "User-Agent": GITHUB_FETCH_HEADERS["User-Agent"] },
     });
   } catch {
     return NextResponse.json(

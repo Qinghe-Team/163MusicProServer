@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS } from "@/lib/github";
+import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS, GITHUB_API_CACHE_TTL } from "@/lib/github";
 
 function extractBuildNumber(tagName: string): number | null {
   const match = tagName.match(/build(\d+)$/);
@@ -43,7 +43,7 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
   try {
     ghRes = await fetch(GITHUB_RELEASES_API, {
       headers: GITHUB_FETCH_HEADERS,
-      next: { revalidate: 60 },
+      next: { revalidate: GITHUB_API_CACHE_TTL },
     });
   } catch {
     return NextResponse.json(
