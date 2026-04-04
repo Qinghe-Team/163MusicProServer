@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS, GITHUB_API_CACHE_TTL } from "@/lib/github";
+import { fetchLatestRelease, checkRateLimit } from "@/lib/github";
 
 function extractBuildNumber(tagName: string): number | null {
   const match = tagName.match(/build(\d+)$/);
@@ -8,6 +8,13 @@ function extractBuildNumber(tagName: string): number | null {
 }
 
 async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
+  if (!checkRateLimit()) {
+    return NextResponse.json(
+      { code: 429, message: "Too many requests, please try again later" },
+      { status: 429 }
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -39,31 +46,15 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  let ghRes: Response;
-  try {
-    ghRes = await fetch(GITHUB_RELEASES_API, {
-      headers: GITHUB_FETCH_HEADERS,
-      next: { revalidate: GITHUB_API_CACHE_TTL },
-    });
-  } catch {
+  const result = await fetchLatestRelease();
+  if (!result.ok) {
     return NextResponse.json(
-      { code: 502, message: "Failed to connect to GitHub API" },
-      { status: 502 }
+      { code: result.status, message: result.message },
+      { status: result.status }
     );
   }
 
-  if (!ghRes.ok) {
-    return NextResponse.json(
-      { code: 502, message: "Failed to fetch releases from GitHub" },
-      { status: 502 }
-    );
-  }
-
-  const releases: Array<{
-    tag_name: string;
-    assets: Array<{ browser_download_url: string }>;
-  }> = await ghRes.json();
-
+  const releases = result.data;
   if (!releases || releases.length === 0) {
     return NextResponse.json(
       { code: 502, message: "No releases found" },

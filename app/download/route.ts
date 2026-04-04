@@ -1,32 +1,23 @@
 import { NextResponse } from "next/server";
-import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS, GITHUB_API_CACHE_TTL } from "@/lib/github";
+import { GITHUB_FETCH_HEADERS, fetchLatestRelease, checkRateLimit } from "@/lib/github";
 
 export async function GET(): Promise<NextResponse> {
-  let ghRes: Response;
-  try {
-    ghRes = await fetch(GITHUB_RELEASES_API, {
-      headers: GITHUB_FETCH_HEADERS,
-      next: { revalidate: GITHUB_API_CACHE_TTL },
-    });
-  } catch {
+  if (!checkRateLimit()) {
     return NextResponse.json(
-      { code: 502, message: "Failed to connect to GitHub API" },
-      { status: 502 }
+      { code: 429, message: "Too many requests, please try again later" },
+      { status: 429 }
     );
   }
 
-  if (!ghRes.ok) {
+  const result = await fetchLatestRelease();
+  if (!result.ok) {
     return NextResponse.json(
-      { code: 502, message: "Failed to fetch releases from GitHub" },
-      { status: 502 }
+      { code: result.status, message: result.message },
+      { status: result.status }
     );
   }
 
-  const releases: Array<{
-    tag_name: string;
-    assets: Array<{ browser_download_url: string; name: string; size: number }>;
-  }> = await ghRes.json();
-
+  const releases = result.data;
   if (!releases || releases.length === 0) {
     return NextResponse.json(
       { code: 502, message: "No releases found" },
