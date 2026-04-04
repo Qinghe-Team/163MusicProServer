@@ -146,7 +146,7 @@
 .heroTagline {
   font-size: 22px;
   font-weight: 400;
-  color: #5c5c5c;
+  color: #999999;
   margin-bottom: 22px;
   letter-spacing: -0.3px;
 }
@@ -154,7 +154,7 @@
 .heroDesc {
   font-size: 15.5px;
   line-height: 1.75;
-  color: #565656;
+  color: #888888;
   max-width: 520px;
   margin-bottom: 44px;
 }
@@ -210,7 +210,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #3a3a3a;
+  color: #666666;
   margin-bottom: 28px;
 }
 
@@ -262,7 +262,7 @@
 .featureDesc {
   font-size: 13px;
   line-height: 1.65;
-  color: #555;
+  color: #888888;
 }
 
 /* ── Project Meta ── */
@@ -299,7 +299,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #333;
+  color: #666666;
 }
 
 .metaValue {
@@ -323,7 +323,7 @@
 }
 
 .metaSep {
-  color: #333;
+  color: #555555;
   font-family: inherit;
 }
 
@@ -342,11 +342,11 @@
 
 .footerInner p {
   font-size: 12.5px;
-  color: #333;
+  color: #666666;
 }
 
 .footerInner a {
-  color: #444;
+  color: #777777;
   transition: color 0.15s;
 }
 
@@ -367,20 +367,32 @@
 
 @media (max-width: 600px) {
   .hero {
-    padding: 120px 20px 72px;
+    padding: 88px 20px 56px;
   }
 
   .features,
   .meta {
-    padding: 52px 20px 60px;
+    padding: 44px 20px 52px;
+  }
+
+  .heroBadges {
+    margin-bottom: 20px;
   }
 
   .heroTitle {
-    letter-spacing: -2.5px;
+    font-size: clamp(40px, 11vw, 64px);
+    letter-spacing: -2px;
+    margin-bottom: 12px;
   }
 
   .heroTagline {
-    font-size: 18px;
+    font-size: 17px;
+    margin-bottom: 14px;
+  }
+
+  .heroDesc {
+    font-size: 14.5px;
+    margin-bottom: 28px;
   }
 
   .featureGrid {
@@ -393,5 +405,34 @@
 
   .navInner {
     padding: 0 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero {
+    padding: 80px 16px 48px;
+  }
+
+  .heroTitle {
+    font-size: clamp(36px, 12vw, 56px);
+    letter-spacing: -1.5px;
+  }
+
+  .heroTagline {
+    font-size: 15px;
+  }
+
+  .heroDesc {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .heroCtas {
+    flex-direction: column;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    justify-content: center;
   }
 }
