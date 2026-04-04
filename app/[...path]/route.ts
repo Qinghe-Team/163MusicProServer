@@ -4,7 +4,7 @@ const GITHUB_API =
   "https://api.github.com/repos/9xhk-1/163MusicPro/releases?per_page=1";
 
 function extractBuildNumber(tagName: string): number | null {
-  const match = tagName.match(/build(\d+)$/i);
+  const match = tagName.match(/build(\d+)$/);
   if (!match) return null;
   return parseInt(match[1], 10);
 }
@@ -41,14 +41,22 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const ghRes = await fetch(GITHUB_API, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "163MusicProServer",
-    },
-    next: { revalidate: 60 },
-  });
+  let ghRes: Response;
+  try {
+    ghRes = await fetch(GITHUB_API, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "163MusicProServer",
+      },
+      next: { revalidate: 60 },
+    });
+  } catch {
+    return NextResponse.json(
+      { code: 502, message: "Failed to connect to GitHub API" },
+      { status: 502 }
+    );
+  }
 
   if (!ghRes.ok) {
     return NextResponse.json(
