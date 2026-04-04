@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const GITHUB_API =
-  "https://api.github.com/repos/9xhk-1/163MusicPro/releases?per_page=1";
+import { GITHUB_RELEASES_API, GITHUB_FETCH_HEADERS, GITHUB_API_CACHE_TTL } from "@/lib/github";
 
 function extractBuildNumber(tagName: string): number | null {
   const match = tagName.match(/build(\d+)$/);
@@ -43,13 +41,9 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
 
   let ghRes: Response;
   try {
-    ghRes = await fetch(GITHUB_API, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "163MusicProServer",
-      },
-      next: { revalidate: 60 },
+    ghRes = await fetch(GITHUB_RELEASES_API, {
+      headers: GITHUB_FETCH_HEADERS,
+      next: { revalidate: GITHUB_API_CACHE_TTL },
     });
   } catch {
     return NextResponse.json(
