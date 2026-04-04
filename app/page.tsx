@@ -70,7 +70,7 @@ export default async function HomePage() {
 
       {/* ── Hero ── */}
       <section className={styles.hero}>
-        <div className={styles.heroGlow} aria-hidden="true" />
+        <div className={styles.heroGlow} aria-hidden="false" />
         <div className={styles.heroInner}>
           <div className={styles.heroBadges}>
             <span className={styles.badge}>适用于小天才电话手表</span>
