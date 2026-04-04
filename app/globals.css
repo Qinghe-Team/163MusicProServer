@@ -8,11 +8,11 @@ body {
 
 body {
   min-height: 100%;
-  display: flex;
+  display: block;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  flex: 1;
+  
 }
 
 * {
