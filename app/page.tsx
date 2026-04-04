@@ -22,7 +22,7 @@ const FEATURES = [
   {
     icon: "⚡",
     title: "倍速播放",
-    desc: "0.1x – 5.0x 自由调速，支持音调不变模式",
+    desc: "0.1x – 5.0x 自由调速，支持音调不变/改变模式",
   },
   {
     icon: "❤️",
@@ -33,6 +33,11 @@ const FEATURES = [
     icon: "🛡️",
     title: "后台保活",
     desc: "前台服务 + WakeLock，锁屏不被系统杀死",
+  },
+  {
+    icon: "ℹ️",
+    title: "更多功能",
+    desc: "还有评论、音乐百科、歌单等高级功能，让您拥有更好的听歌体验",
   },
 ];
 
@@ -131,10 +136,6 @@ export default async function HomePage() {
               <span className={styles.metaValue}>163MusicPro</span>
             </div>
             <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>当前版本</span>
-              <span className={styles.metaValue}>{version ?? "—"}</span>
-            </div>
-            <div className={styles.metaItem}>
               <span className={styles.metaLabel}>作者</span>
               <span className={styles.metaValue}>
                 <a
@@ -143,7 +144,7 @@ export default async function HomePage() {
                   rel="noopener noreferrer"
                   className={styles.metaLink}
                 >
-                  9xhk
+                  Qinghe
                 </a>
                 <span className={styles.metaSep}>/</span>
                 <a
@@ -158,7 +159,7 @@ export default async function HomePage() {
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>平台</span>
-              <span className={styles.metaValue}>Android 6.0+ · 320×360</span>
+              <span className={styles.metaValue}>Android 7.1-8.1 · 320×360</span>
             </div>
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>简介</span>
