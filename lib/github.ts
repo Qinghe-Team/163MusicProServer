@@ -68,6 +68,26 @@ export async function fetchLatestRelease(): Promise<
 }
 
 // ---------------------------------------------------------------------------
+// In-memory APK binary cache – keyed by versionCode (tag_name)
+// ---------------------------------------------------------------------------
+export type ApkCache = {
+  versionCode: string;
+  data: ArrayBuffer;
+  name: string;
+  contentType: string;
+} | null;
+
+let apkCache: ApkCache = null;
+
+export function getApkCache(): ApkCache {
+  return apkCache;
+}
+
+export function setApkCache(entry: NonNullable<ApkCache>): void {
+  apkCache = entry;
+}
+
+// ---------------------------------------------------------------------------
 // In-memory rate limiter – 10 requests per minute across all endpoints
 // ---------------------------------------------------------------------------
 const RATE_LIMIT_MAX = 10;
