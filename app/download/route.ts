@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { GITHUB_FETCH_HEADERS, fetchLatestRelease, checkRateLimit } from "@/lib/github";
+import {
+  GITHUB_FETCH_HEADERS,
+  fetchLatestRelease,
+  checkRateLimit,
+  getApkCache,
+  setApkCache,
+} from "@/lib/github";
 
 export async function GET(): Promise<NextResponse> {
   if (!checkRateLimit()) {
@@ -35,12 +41,22 @@ export async function GET(): Promise<NextResponse> {
   }
 
   const asset = latest.assets[0];
-  const downloadUrl = asset.browser_download_url;
+  const versionCode = latest.tag_name;
 
-  // Proxy the download by streaming the asset from GitHub
+  // Return cached APK if the version matches
+  const cached = getApkCache();
+  if (cached && cached.versionCode === versionCode) {
+    const headers = new Headers();
+    headers.set("Content-Disposition", `attachment; filename="${cached.name}"`);
+    headers.set("Content-Type", cached.contentType);
+    headers.set("Content-Length", String(cached.data.byteLength));
+    return new NextResponse(cached.data, { status: 200, headers });
+  }
+
+  // Fetch from GitHub and populate the cache
   let fileRes: Response;
   try {
-    fileRes = await fetch(downloadUrl, {
+    fileRes = await fetch(asset.browser_download_url, {
       headers: { "User-Agent": GITHUB_FETCH_HEADERS["User-Agent"] },
     });
   } catch {
@@ -57,19 +73,17 @@ export async function GET(): Promise<NextResponse> {
     );
   }
 
-  const headers = new Headers();
-  headers.set(
-    "Content-Disposition",
-    `attachment; filename="${asset.name}"`
-  );
-  headers.set(
-    "Content-Type",
-    fileRes.headers.get("Content-Type") ?? "application/octet-stream"
-  );
-  const contentLength = fileRes.headers.get("Content-Length");
-  if (contentLength) {
-    headers.set("Content-Length", contentLength);
-  }
+  const contentType =
+    fileRes.headers.get("Content-Type") ?? "application/octet-stream";
 
-  return new NextResponse(fileRes.body, { status: 200, headers });
+  const data = await fileRes.arrayBuffer();
+
+  setApkCache({ versionCode, data, name: asset.name, contentType });
+
+  const headers = new Headers();
+  headers.set("Content-Disposition", `attachment; filename="${asset.name}"`);
+  headers.set("Content-Type", contentType);
+  headers.set("Content-Length", String(data.byteLength));
+
+  return new NextResponse(data, { status: 200, headers });
 }
