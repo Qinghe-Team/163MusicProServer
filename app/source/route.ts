@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { checkRateLimit, GITHUB_FETCH_HEADERS } from "@/lib/github";
 
 const SOURCE_JSON_URL =
