@@ -53,25 +53,7 @@ async function fetchSourceList(): Promise<
   return { ok: true, data };
 }
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const { searchParams } = req.nextUrl;
-  const versionParam = searchParams.get("version");
-
-  if (versionParam === null) {
-    return NextResponse.json(
-      { code: 400, message: "version parameter is required" },
-      { status: 400 }
-    );
-  }
-
-  const version = parseInt(versionParam, 10);
-  if (isNaN(version)) {
-    return NextResponse.json(
-      { code: 400, message: "version must be an integer" },
-      { status: 400 }
-    );
-  }
-
+export async function GET(): Promise<NextResponse> {
   if (!checkRateLimit()) {
     return NextResponse.json(
       { code: 429, message: "Too many requests, please try again later" },
