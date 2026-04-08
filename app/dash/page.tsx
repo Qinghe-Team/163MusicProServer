@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dash.module.css";
 
-type DayCount = { day: string; count: number };
+type ReqStats = { total: number; today: number };
 type Suggestion = { id: number; content: string; created_at: number };
 
 function authHeaders(token: string): HeadersInit {
@@ -19,8 +19,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
 
-  // Requests
-  const [requests, setRequests] = useState<DayCount[]>([]);
+  // Requests stats
+  const [reqStats, setReqStats] = useState<ReqStats>({ total: 0, today: 0 });
   const [reqLoading, setReqLoading] = useState(false);
   const [reqError, setReqError] = useState("");
 
@@ -50,7 +50,7 @@ export default function DashboardPage() {
         const res = await fetch("/dash/api/requests", { headers: authHeaders(t) });
         const data = await res.json();
         if (data.code === 200) {
-          setRequests(data.data);
+          setReqStats(data.data);
         } else if (data.code === 401) {
           sessionStorage.removeItem("dash_token");
           router.replace("/dash/login");
@@ -113,12 +113,6 @@ export default function DashboardPage() {
 
   const totalPages = Math.ceil(sugTotal / PAGE_SIZE);
 
-  // Bar chart helpers
-  const maxCount = requests.length > 0 ? Math.max(...requests.map((r) => r.count), 1) : 1;
-  const todayCount = requests.find(
-    (r) => r.day === new Date().toISOString().slice(0, 10)
-  )?.count ?? 0;
-
   if (!token) return null;
 
   return (
@@ -139,48 +133,22 @@ export default function DashboardPage() {
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>今日请求</span>
-            <span className={styles.statValue}>{todayCount}</span>
+            <span className={styles.statValue}>
+              {reqLoading ? "…" : reqError ? "–" : reqStats.today}
+            </span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>总请求数</span>
+            <span className={styles.statValue}>
+              {reqLoading ? "…" : reqError ? "–" : reqStats.total}
+            </span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>反馈总数</span>
             <span className={styles.statValue}>{sugTotal}</span>
           </div>
         </div>
-
-        {/* Daily Requests Chart */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>日请求量（近30天）</h2>
-            <button
-              className={styles.refreshBtn}
-              onClick={() => token && fetchRequests(token)}
-              disabled={reqLoading}
-            >
-              {reqLoading ? "加载中…" : "刷新"}
-            </button>
-          </div>
-          {reqError && <p className={styles.errorMsg}>{reqError}</p>}
-          {!reqLoading && !reqError && requests.length === 0 && (
-            <p className={styles.empty}>暂无请求数据</p>
-          )}
-          {requests.length > 0 && (
-            <div className={styles.chartWrap}>
-              <div className={styles.chart}>
-                {requests.map((r) => (
-                  <div key={r.day} className={styles.barCol}>
-                    <span className={styles.barCount}>{r.count}</span>
-                    <div
-                      className={styles.bar}
-                      style={{ height: `${Math.round((r.count / maxCount) * 120)}px` }}
-                      title={`${r.day}: ${r.count}`}
-                    />
-                    <span className={styles.barLabel}>{r.day.slice(5)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
+        {reqError && <p className={styles.errorMsg}>{reqError}</p>}
 
         {/* Suggestions */}
         <section className={styles.section}>
@@ -188,10 +156,14 @@ export default function DashboardPage() {
             <h2 className={styles.sectionTitle}>用户反馈（共 {sugTotal} 条）</h2>
             <button
               className={styles.refreshBtn}
-              onClick={() => token && fetchSuggestions(token, sugPage)}
-              disabled={sugLoading}
+              onClick={() => {
+                if (!token) return;
+                fetchRequests(token);
+                fetchSuggestions(token, sugPage);
+              }}
+              disabled={sugLoading || reqLoading}
             >
-              {sugLoading ? "加载中…" : "刷新"}
+              {sugLoading || reqLoading ? "加载中…" : "刷新"}
             </button>
           </div>
           {sugError && <p className={styles.errorMsg}>{sugError}</p>}

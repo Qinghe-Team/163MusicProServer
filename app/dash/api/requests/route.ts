@@ -2,28 +2,22 @@ import { NextResponse } from "next/server";
 import { getPool, ensureDb } from "@/lib/db";
 import type { RowDataPacket } from "mysql2";
 
-type DayCountRow = RowDataPacket & { day: string; count: string | number };
+type StatsRow = RowDataPacket & { total: string | number; today: string | number };
 
 export async function GET(): Promise<NextResponse> {
   try {
     await ensureDb();
-    // Return daily request counts for the last 30 days
-    const [rows] = await getPool().execute<DayCountRow[]>(`
+    const [[row]] = await getPool().execute<StatsRow[]>(`
       SELECT
-        DATE(FROM_UNIXTIME(timestamp / 1000)) AS day,
-        COUNT(*) AS count
+        COUNT(*) AS total,
+        SUM(CASE WHEN DATE(FROM_UNIXTIME(timestamp / 1000)) = CURDATE() THEN 1 ELSE 0 END) AS today
       FROM requests
-      WHERE timestamp >= UNIX_TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 30 DAY)) * 1000
-      GROUP BY day
-      ORDER BY day ASC
     `);
 
-    const data = rows.map((r) => ({
-      day: r.day,
-      count: Number(r.count),
-    }));
-
-    return NextResponse.json({ code: 200, data });
+    return NextResponse.json({
+      code: 200,
+      data: { total: Number(row.total), today: Number(row.today) },
+    });
   } catch (err) {
     console.error("[dash/requests] db error:", err);
     return NextResponse.json({ code: 500, message: "Database error" }, { status: 500 });
