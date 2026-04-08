@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, GITHUB_FETCH_HEADERS } from "@/lib/github";
+import { logRequest } from "@/lib/request-logger";
 
 const SOURCE_JSON_URL =
   "https://raw.githubusercontent.com/9xhk-1/163MusicPro/main/source.json";
@@ -53,7 +54,8 @@ async function fetchSourceList(): Promise<
   return { ok: true, data };
 }
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  logRequest(req);
   if (!checkRateLimit()) {
     return NextResponse.json(
       { code: 429, message: "Too many requests, please try again later" },

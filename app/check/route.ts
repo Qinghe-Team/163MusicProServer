@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchLatestRelease, checkRateLimit } from "@/lib/github";
+import { logRequest } from "@/lib/request-logger";
 
 function extractBuildNumber(tagName: string): number | null {
   const match = tagName.match(/build(\d+)$/);
@@ -8,6 +9,7 @@ function extractBuildNumber(tagName: string): number | null {
 }
 
 async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
+  logRequest(req);
   if (!checkRateLimit()) {
     return NextResponse.json(
       { code: 429, message: "Too many requests, please try again later" },
