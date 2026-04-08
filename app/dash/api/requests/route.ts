@@ -13,7 +13,7 @@ export async function GET(): Promise<NextResponse> {
         DATE(FROM_UNIXTIME(timestamp / 1000)) AS day,
         COUNT(*) AS count
       FROM requests
-      WHERE timestamp >= UNIX_TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 29 DAY)) * 1000
+      WHERE timestamp >= UNIX_TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 30 DAY)) * 1000
       GROUP BY day
       ORDER BY day ASC
     `);

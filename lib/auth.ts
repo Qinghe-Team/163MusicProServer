@@ -26,7 +26,11 @@ export function getRsaPublicKeyPem(): string {
 export function rsaDecrypt(encryptedBase64: string): string {
   const buffer = Buffer.from(encryptedBase64, "base64");
   const decrypted = crypto.privateDecrypt(
-    { key: getRsaKeyPair().privateKey, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },
+    {
+      key: getRsaKeyPair().privateKey,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: "sha256",
+    },
     buffer
   );
   return decrypted.toString("utf8");

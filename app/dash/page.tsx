@@ -11,7 +11,7 @@ function authHeaders(token: string): HeadersInit {
   return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 }
 
-function formatDate(ts: number): string {
+function formatDateTime(ts: number): string {
   return new Date(ts).toLocaleString("zh-CN");
 }
 
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                       <tr key={s.id} className={styles.tr}>
                         <td className={styles.td}>{s.id}</td>
                         <td className={`${styles.td} ${styles.tdContent}`}>{s.content}</td>
-                        <td className={styles.td}>{formatDate(s.created_at)}</td>
+                        <td className={styles.td}>{formatDateTime(s.created_at)}</td>
                       </tr>
                     ))}
                   </tbody>

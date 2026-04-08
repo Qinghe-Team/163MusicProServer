@@ -8,7 +8,7 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   if (pathname.startsWith("/dash/api/")) {
     const isPublic =
       pathname === "/dash/api/login" ||
-      pathname.startsWith("/dash/api/auth/");
+      pathname === "/dash/api/auth/pubkey";
 
     if (!isPublic) {
       const authHeader = req.headers.get("authorization");

@@ -4,13 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
 
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    forge?: any;
-  }
-}
-
 async function encryptWithPublicKey(publicKeyPem: string, text: string): Promise<string> {
   // Use Web Crypto API (SubtleCrypto) to encrypt with RSA-OAEP
   const pemContents = publicKeyPem
@@ -27,7 +20,7 @@ async function encryptWithPublicKey(publicKeyPem: string, text: string): Promise
   const cryptoKey = await crypto.subtle.importKey(
     "spki",
     spkiDer.buffer as ArrayBuffer,
-    { name: "RSA-OAEP", hash: "SHA-1" },
+    { name: "RSA-OAEP", hash: "SHA-256" },
     false,
     ["encrypt"]
   );

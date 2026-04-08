@@ -1,18 +1,28 @@
 import mysql from "mysql2/promise";
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Environment variable ${name} is required but not set`);
+  return value;
+}
+
 let pool: mysql.Pool | null = null;
 
 export function getPool(): mysql.Pool {
   if (pool) return pool;
 
-  const port = process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306;
+  const rawPort = process.env.MYSQL_PORT ?? "3306";
+  const port = parseInt(rawPort, 10);
+  if (isNaN(port) || port <= 0 || port > 65535) {
+    throw new Error(`MYSQL_PORT is invalid: "${rawPort}". Must be a number between 1 and 65535.`);
+  }
 
   pool = mysql.createPool({
-    host: process.env.MYSQL_HOST,
+    host: requireEnv("MYSQL_HOST"),
     port,
-    database: process.env.MYSQL_DATABASE_NAME,
-    user: process.env.MYSQL_USERNAME,
-    password: process.env.MYSQL_PASSWORD,
+    database: requireEnv("MYSQL_DATABASE_NAME"),
+    user: requireEnv("MYSQL_USERNAME"),
+    password: requireEnv("MYSQL_PASSWORD"),
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
