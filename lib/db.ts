@@ -26,6 +26,9 @@ export function getPool(): mysql.Pool {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    connectTimeout: 30000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
   });
 
   return pool;
@@ -67,6 +70,9 @@ export async function ensureDb(): Promise<void> {
   dbInitializing = initDb().then(() => {
     dbInitialized = true;
     dbInitializing = null;
+  }).catch((err) => {
+    dbInitializing = null;
+    throw err;
   });
   await dbInitializing;
 }
