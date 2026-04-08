@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   GITHUB_FETCH_HEADERS,
   fetchLatestRelease,
@@ -6,8 +6,10 @@ import {
   getApkCache,
   setApkCache,
 } from "@/lib/github";
+import { logRequest } from "@/lib/request-logger";
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  logRequest(req);
   if (!checkRateLimit()) {
     return NextResponse.json(
       { code: 429, message: "Too many requests, please try again later" },
