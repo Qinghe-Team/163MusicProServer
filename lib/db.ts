@@ -24,7 +24,7 @@ export function getPool(): mysql.Pool {
     user: requireEnv("MYSQL_USERNAME"),
     password: requireEnv("MYSQL_PASSWORD"),
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: 1,
     queueLimit: 0,
     connectTimeout: 30000,
     enableKeepAlive: true,
