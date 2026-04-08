@@ -14,8 +14,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     await ensureDb();
     const [rows] = await getPool().execute<SuggestionRow[]>(
-      "SELECT id, content, created_at FROM suggestions ORDER BY created_at DESC LIMIT ? OFFSET ?",
-      [pageSize, offset]
+      `SELECT id, content, created_at FROM suggestions ORDER BY created_at DESC LIMIT ${pageSize} OFFSET ${offset}`
     );
     const [[countRow]] = await getPool().execute<CountRow[]>(
       "SELECT COUNT(*) AS total FROM suggestions"
