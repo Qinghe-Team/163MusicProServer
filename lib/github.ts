@@ -31,6 +31,7 @@ export type ReleaseAsset = {
 };
 
 export type Release = {
+  name: string | null;
   tag_name: string;
   assets: ReleaseAsset[];
 };
