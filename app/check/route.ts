@@ -9,7 +9,7 @@ function extractBuildNumber(tagName: string): number | null {
 }
 
 function extractVersionName(tagName: string): string {
-  return tagName.replace(/-build\d+$/i, "");
+  return tagName.replace(/-build\d+$/, "");
 }
 
 async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
