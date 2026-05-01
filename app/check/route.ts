@@ -8,6 +8,10 @@ function extractBuildNumber(tagName: string): number | null {
   return parseInt(match[1], 10);
 }
 
+function extractVersionName(tagName: string): string {
+  return tagName.replace(/-build\d+$/, "");
+}
+
 async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
   logRequest(req);
   if (!checkRateLimit()) {
@@ -66,6 +70,7 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
 
   const latest = releases[0];
   const latestBuild = extractBuildNumber(latest.tag_name);
+  const versionName = extractVersionName(latest.tag_name);
 
   if (latestBuild === null) {
     return NextResponse.json(
@@ -85,6 +90,7 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
       data: {
         download_url: downloadUrl,
         version: latestBuild,
+        versionName,
         is_latest: false,
       },
     });
@@ -95,6 +101,7 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
     data: {
       download_url: null,
       version: latestBuild,
+      versionName,
       is_latest: true,
     },
   });
