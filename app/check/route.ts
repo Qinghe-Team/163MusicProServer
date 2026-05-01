@@ -9,7 +9,7 @@ function extractBuildNumber(tagName: string): number | null {
 }
 
 function extractVersionName(releaseName: string | null, tagName: string): string {
-  const rawName = releaseName ?? tagName;
+  const rawName = releaseName?.trim() ? releaseName : tagName;
   return rawName.replace(/-build[^-\s]*$/i, "");
 }
 
