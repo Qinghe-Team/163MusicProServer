@@ -8,9 +8,8 @@ function extractBuildNumber(tagName: string): number | null {
   return parseInt(match[1], 10);
 }
 
-function extractVersionName(releaseName: string | null, tagName: string): string {
-  const rawName = releaseName?.trim() ? releaseName : tagName;
-  return rawName.replace(/-build\d+$/i, "");
+function extractVersionName(tagName: string): string {
+  return tagName.replace(/-build\d+$/i, "");
 }
 
 async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
@@ -71,7 +70,7 @@ async function handleCheckUpdate(req: NextRequest): Promise<NextResponse> {
 
   const latest = releases[0];
   const latestBuild = extractBuildNumber(latest.tag_name);
-  const versionName = extractVersionName(latest.name, latest.tag_name);
+  const versionName = extractVersionName(latest.tag_name);
 
   if (latestBuild === null) {
     return NextResponse.json(
